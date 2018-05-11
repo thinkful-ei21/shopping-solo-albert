@@ -1,17 +1,35 @@
 'use strict';
 
-const STORE = [
-  {name: 'apples', checked: false},
-  {name: 'oranges', checked: false},
-  {name: 'milk', checked: true},
-  {name: 'bread', checked: false}
-];
+const STORE = {
+  items: [
+    {name: 'apples', checked: false},
+    {name: 'oranges', checked: false},
+    {name: 'milk', checked: true},
+    {name: 'bread', checked: false}
+  ],
+  hideChecked: false
+};
 
 
-function generateItemElement(item, itemIndex, template) {
-  return `
+function generateItemElement(item, itemIndex) {
+  if(STORE.hideChecked === false) {
+    return `
     <li class="js-item-index-element" data-item-index="${itemIndex}">
-      <span class="shopping-item js-shopping-item ${item.checked ? "shopping-item__checked" : ''}">${item.name}</span>
+      <span class="shopping-item js-shopping-item ${item.checked ? "shopping-item__checked" : ""}">${item.name}</span>
+      <div class="shopping-item-controls">
+        <button class="shopping-item-toggle js-item-toggle">
+          <span class="button-label">check</span>
+        </button>
+        <button class="shopping-item-delete js-item-delete">
+          <span class="button-label">delete</span>
+        </button>
+      </div>
+    </li>`;
+  }
+  if(STORE.hideChecked === true) {
+    return `
+    <li class="js-item-index-element" data-item-index="${itemIndex}">
+      <span class="shopping-item js-shopping-item ${item.checked ? "shopping-item__checked hidden" : ""}">${item.name}</span>
       <div class="shopping-item-controls">
         <button class="shopping-item-toggle js-item-toggle">
             <span class="button-label">check</span>
@@ -21,31 +39,34 @@ function generateItemElement(item, itemIndex, template) {
         </button>
       </div>
     </li>`;
+  }
 }
 
 
-function generateShoppingItemsString(shoppingList) {
+function generateShoppingItemsString(shoppingListArray) {
   console.log('Generating shopping list element');
 
-  const items = shoppingList.map((item, index) => generateItemElement(item, index));
+  const itemsArray = shoppingListArray.map((item, index) => generateItemElement(item, index));
   
-  return items.join('');
+  return itemsArray.join('');
 }
 
 
 function renderShoppingList() {
   // render the shopping list in the DOM
   console.log('`renderShoppingList` ran');
-  const shoppingListItemsString = generateShoppingItemsString(STORE);
+
+  const displayedItems = $('.js-shopping-list');
+  const shoppingListItemsString = generateShoppingItemsString(STORE.items);
 
   // insert that HTML into the DOM
-  $('.js-shopping-list').html(shoppingListItemsString);
+  displayedItems.html(shoppingListItemsString);
 }
 
 
 function addItemToShoppingList(itemName) {
   console.log(`Adding "${itemName}" to shopping list`);
-  STORE.push({name: itemName, checked: false});
+  STORE.items.push({name: itemName, checked: false});
 }
 
 function handleNewItemSubmit() {
@@ -61,7 +82,7 @@ function handleNewItemSubmit() {
 
 function toggleCheckedForListItem(itemIndex) {
   console.log(`Toggling checked property for item at index ${itemIndex}`);
-  STORE[itemIndex].checked = !STORE[itemIndex].checked;
+  STORE.items[itemIndex].checked = !STORE.items[itemIndex].checked;
 }
 
 
@@ -83,18 +104,26 @@ function handleItemCheckClicked() {
 
 function deleteListItem(itemIndex) { 
   console.log(`Deleted item from index ${itemIndex} from list`);
-  STORE.splice(itemIndex, 1);
+  STORE.items.splice(itemIndex, 1);
 }
 
 function handleDeleteItemClicked() {
-  // this function will be responsible for when users want to delete a shopping list
-  // item
   $('.js-shopping-list').on('click', '.js-item-delete', function(event) {
     const itemIndex = getItemIndexFromElement(event.currentTarget);
     deleteListItem(itemIndex);
     renderShoppingList();
   });
 }
+
+function handleSwitchToggle() {
+  $('.js-display-switch').on('click', function(event) {
+    if(STORE.hideChecked === true) STORE.hideChecked = false;
+    else if(STORE.hideChecked === false) STORE.hideChecked = true;
+    console.log(`Hide checked items changed to ${STORE.hideChecked}`);
+    renderShoppingList();
+  });
+}
+
 
 // this function will be our callback when the page loads. it's responsible for
 // initially rendering the shopping list, and activating our individual functions
@@ -105,6 +134,7 @@ function handleShoppingList() {
   handleNewItemSubmit();
   handleItemCheckClicked();
   handleDeleteItemClicked();
+  handleSwitchToggle();
 }
 
 // when the page loads, call `handleShoppingList`
