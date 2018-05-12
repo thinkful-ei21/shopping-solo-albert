@@ -1,5 +1,6 @@
 'use strict';
 
+
 const STORE = {
   items: [
     {name: 'apples', checked: false},
@@ -25,13 +26,15 @@ function generateItemElement(item, itemIndex) {
         <button class="shopping-item-toggle js-item-toggle">
           <span class="button-label">check</span>
         </button>
+        <button class="shopping-item-rename js-item-rename">
+          <span class="button-label">rename</span>
+        </button>
         <button class="shopping-item-delete js-item-delete">
           <span class="button-label">delete</span>
         </button>
       </div>
     </li>`;
 }
-
 
 function generateShoppingItemsString(shoppingListArray) {
   console.log('Generating shopping list element');
@@ -40,7 +43,6 @@ function generateShoppingItemsString(shoppingListArray) {
   
   return itemsArray.join('');
 }
-
 
 function renderShoppingList() {
   // render the shopping list in the DOM
@@ -70,9 +72,14 @@ function handleNewItemSubmit() {
   });
 }
 
-function toggleCheckedForListItem(itemIndex) {
-  console.log(`Toggling checked property for item at index ${itemIndex}`);
-  STORE.items[itemIndex].checked = !STORE.items[itemIndex].checked;
+
+function handleDisplayToggle() {
+  $('.js-display-switch').on('click', function(event) {
+    if(STORE.hideChecked === true) STORE.hideChecked = false;
+    else if(STORE.hideChecked === false) STORE.hideChecked = true;
+    console.log(`Hide checked items changed to ${STORE.hideChecked}`);
+    renderShoppingList();
+  });
 }
 
 
@@ -83,6 +90,12 @@ function getItemIndexFromElement(item) {
   return parseInt(itemIndexString, 10);
 }
 
+
+function toggleCheckedForListItem(itemIndex) {
+  console.log(`Toggling checked property for item at index ${itemIndex}`);
+  STORE.items[itemIndex].checked = !STORE.items[itemIndex].checked;
+}
+
 function handleItemCheckClicked() {
   $('.js-shopping-list').on('click', '.js-item-toggle', function(event) {
     console.log('`handleItemCheckClicked` ran');
@@ -91,6 +104,23 @@ function handleItemCheckClicked() {
     renderShoppingList();
   });
 }
+
+
+function renameListItem(itemIndex, newItemName) {
+  console.log(`index of item being renamed: ${itemIndex}`);
+  STORE.items[itemIndex].name = newItemName;
+}
+
+function handleRenameItemClicked() {
+  $('.js-shopping-list').on('click', '.js-item-rename', function(event) {
+    // ask user for new item name
+    const newItemName = prompt('Enter new item name:');
+    const itemIndex = getItemIndexFromElement(event.currentTarget);
+    renameListItem(itemIndex, newItemName);
+    renderShoppingList();
+  });
+}
+
 
 function deleteListItem(itemIndex) { 
   console.log(`Deleted item from index ${itemIndex} from list`);
@@ -105,15 +135,6 @@ function handleDeleteItemClicked() {
   });
 }
 
-function handleSwitchToggle() {
-  $('.js-display-switch').on('click', function(event) {
-    if(STORE.hideChecked === true) STORE.hideChecked = false;
-    else if(STORE.hideChecked === false) STORE.hideChecked = true;
-    console.log(`Hide checked items changed to ${STORE.hideChecked}`);
-    renderShoppingList();
-  });
-}
-
 
 // this function will be our callback when the page loads. it's responsible for
 // initially rendering the shopping list, and activating our individual functions
@@ -122,10 +143,12 @@ function handleSwitchToggle() {
 function handleShoppingList() {
   renderShoppingList();
   handleNewItemSubmit();
+  handleDisplayToggle();
   handleItemCheckClicked();
+  handleRenameItemClicked();
   handleDeleteItemClicked();
-  handleSwitchToggle();
 }
+
 
 // when the page loads, call `handleShoppingList`
 $(handleShoppingList);
