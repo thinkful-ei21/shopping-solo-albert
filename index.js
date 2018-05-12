@@ -8,7 +8,9 @@ const STORE = {
     {name: 'milk', checked: true},
     {name: 'bread', checked: false}
   ],
-  hideChecked: false
+  hideChecked: false,
+  searchMode: false,
+  searchQuery: ''
 };
 
 
@@ -17,10 +19,13 @@ function generateItemElement(item, itemIndex) {
   if(item.checked === true) isChecked = 'shopping-item__checked';
 
   let isDisplayed = '';
-  if(STORE.hideChecked === true && item.checked === true) isDisplayed = 'hidden';
+  if(STORE.hideChecked === true && item.checked === true) isDisplayed = 'not-displayed';
+
+  let isQueried = '';
+  if(STORE.searchMode === true && STORE.searchQuery !== item.name) isQueried = 'not-queried';
 
   return `
-    <li class="js-item-index-element ${isDisplayed}" data-item-index="${itemIndex}">
+    <li class="js-item-index-element ${isDisplayed} ${isQueried}" data-item-index="${itemIndex}">
       <span class="shopping-item js-shopping-item ${isChecked}">${item.name}</span>
       <div class="shopping-item-controls">
         <button class="shopping-item-toggle js-item-toggle">
@@ -78,6 +83,32 @@ function handleDisplayToggle() {
     if(STORE.hideChecked === true) STORE.hideChecked = false;
     else if(STORE.hideChecked === false) STORE.hideChecked = true;
     console.log(`Hide checked items changed to ${STORE.hideChecked}`);
+    renderShoppingList();
+  });
+}
+
+
+function handleItemSearch() {
+  $('.js-shopping-list-search').on('click', function(event) {
+    event.preventDefault();
+    console.log('search button clicked');
+    STORE.searchQuery = prompt('What are you looking for?');
+    if (!STORE.searchQuery) {
+      STORE.searchMode = false;
+      STORE.searchQuery = '';
+    }
+    else {
+      STORE.searchMode = true;
+      renderShoppingList();
+    }
+  });
+}
+
+function handleClearSearch() {
+  $('.js-shopping-list-search-clear').on('click', function(event) {
+    event.preventDefault();
+    STORE.searchMode = false;
+    STORE.searchQuery = '';
     renderShoppingList();
   });
 }
@@ -144,6 +175,8 @@ function handleShoppingList() {
   renderShoppingList();
   handleNewItemSubmit();
   handleDisplayToggle();
+  handleItemSearch();
+  handleClearSearch();
   handleItemCheckClicked();
   handleRenameItemClicked();
   handleDeleteItemClicked();

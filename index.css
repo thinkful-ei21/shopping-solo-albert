@@ -14,10 +14,6 @@
     cursor: pointer;
   }
   
-  .hidden {
-    display: none;
-  }
-  
   #shopping-list-item {
     width: 250px;
   }
@@ -50,3 +46,10 @@
     text-decoration: line-through;
   }
   
+  .not-displayed {
+    display: none;
+  }
+
+  .not-queried {
+    display: none;
+  }
