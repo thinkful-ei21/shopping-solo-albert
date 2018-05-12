@@ -12,10 +12,15 @@ const STORE = {
 
 
 function generateItemElement(item, itemIndex) {
-  if(STORE.hideChecked === false) {
-    return `
-    <li class="js-item-index-element" data-item-index="${itemIndex}">
-      <span class="shopping-item js-shopping-item ${item.checked ? "shopping-item__checked" : ""}">${item.name}</span>
+  let isChecked = '';
+  if(item.checked === true) isChecked = 'shopping-item__checked';
+
+  let isDisplayed = '';
+  if(STORE.hideChecked === true && item.checked === true) isDisplayed = 'hidden';
+
+  return `
+    <li class="js-item-index-element ${isDisplayed}" data-item-index="${itemIndex}">
+      <span class="shopping-item js-shopping-item ${isChecked}">${item.name}</span>
       <div class="shopping-item-controls">
         <button class="shopping-item-toggle js-item-toggle">
           <span class="button-label">check</span>
@@ -25,21 +30,6 @@ function generateItemElement(item, itemIndex) {
         </button>
       </div>
     </li>`;
-  }
-  if(STORE.hideChecked === true) {
-    return `
-    <li class="js-item-index-element" data-item-index="${itemIndex}">
-      <span class="shopping-item js-shopping-item ${item.checked ? "shopping-item__checked hidden" : ""}">${item.name}</span>
-      <div class="shopping-item-controls">
-        <button class="shopping-item-toggle js-item-toggle">
-            <span class="button-label">check</span>
-        </button>
-        <button class="shopping-item-delete js-item-delete">
-            <span class="button-label">delete</span>
-        </button>
-      </div>
-    </li>`;
-  }
 }
 
 
